@@ -42,35 +42,42 @@ int main(int argc, char **argv)
 {
     float **array;
     int rank,size,i,j;
+    float numero = 0;
 
     MPI_Init(&argc,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD,&rank);
     MPI_Comm_size(MPI_COMM_WORLD,&size);
 
-    malloc2dfloat(&array, 10, 10);//Asigna memoria a la matriz que va a ser enviada
+    malloc2dfloat(&array, 9, 9);//Asigna memoria a la matriz que va a ser enviada
     if (rank == 0){
-      cout << "Hola del proce: " << rank << endl;
-      for(i=0;i<10;i++){
-        for(j=0;j<10;j++){
-            array[i][j]=i+j;
+      cout << "Hola del proce: " << rank << " y el numero es: " << numero << endl;
+      for(i=0;i<9;i++){
+        for(j=0;j<9;j++){
+            array[i][j]=0;
             cout << array[i][j];
         }
         cout << endl;
       }
     }
 
-    MPI_Bcast(&(array[0][0]), 10*10, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);// sincroniza los procesadores
+    MPI_Bcast(&numero, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&(array[0][0]), 9*9, MPI_FLOAT, 0, MPI_COMM_WORLD);
     cout << endl << endl;
 
     if (rank == 1){
-      cout << "Hola del proce: " << rank << endl;
-      for(i=0;i<10;i++){
-        for(j=0;j<10;j++){
+      numero = 1;
+      cout << "Hola del proce: " << rank << " y el numero es: " << numero << endl;
+      for(i=0;i<9;i++){
+        cout << "Valor numero enviado: ";
+        for(j=0;j<9;j++){
+              array[i][j] = numero;
               cout << array[i][j];
         }
         cout << endl;
       }
     }
+
 
     MPI_Finalize();
 }
